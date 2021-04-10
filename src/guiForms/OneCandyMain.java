@@ -120,7 +120,7 @@ public class OneCandyMain {
 		rightPanel.setVisible(true);
 		
 		controller.getDocumentViewController().setAnnotationCallback(new org.icepdf.ri.common.MyAnnotationCallback(controller.getDocumentViewController()));
-		controller.openDocument("D://Documents//1616110182.pdf");
+		
 		frame.getContentPane().add(viewComponentPanel, BorderLayout.CENTER);
 		frame.getContentPane().add(splitPane2, BorderLayout.CENTER);
 		
