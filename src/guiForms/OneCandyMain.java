@@ -22,6 +22,10 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
+import java.awt.Dimension;
+import javax.swing.DebugGraphics;
+import java.awt.ComponentOrientation;
 
 public class OneCandyMain {
 	/*
@@ -42,7 +46,7 @@ public class OneCandyMain {
 	final JPanel fieldsPanel=new JPanel();
 	final JPanel documentTypePanel=new JPanel();
 	final JPanel leftPanel=new JPanel();
-	final JLayeredPane rightPanel=new JLayeredPane();
+	final JPanel rightPanel=new JPanel();
 	final SwingController controller = new SwingController();
 	final SwingViewBuilder factory = new SwingViewBuilder(controller);
 	final JPanel viewComponentPanel = factory.buildViewerPanel();
@@ -53,6 +57,7 @@ public class OneCandyMain {
 	/**
 	 * Launch the application.
 	 */
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -86,7 +91,7 @@ public class OneCandyMain {
 			}
 		});
 		
-		frame.setBounds(100, 100, 900, 500);
+		frame.setBounds(100, 100, 1052, 659);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setJMenuBar(menuBar);		
 		menuBar.add(mnuFiles);		
@@ -100,6 +105,7 @@ public class OneCandyMain {
 				splitPane.setDividerLocation(300);
 			}
 		});
+		
 		mnuView.add(mnuItemNavigator);		
 		mnuView.add(mnuItemServices);		
 		frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
@@ -108,21 +114,24 @@ public class OneCandyMain {
 		quickAccessToolBar.setOrientation(SwingConstants.VERTICAL);
 		frame.getContentPane().add(quickAccessToolBar, BorderLayout.WEST);
 		frame.getContentPane().add(bottomToolBar, BorderLayout.SOUTH);	
-		//frame.getContentPane().add(rightPanel,BorderLayout.CENTER);
 		splitPane.setDividerLocation(300);
 		splitPane2.setDividerLocation(500);
 		centerPanel.setDividerLocation(400);
 
 		frame.getContentPane().add(viewComponentPanel);
+		rightPanel.setName("");
+		rightPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		rightPanel.setDebugGraphicsOptions(DebugGraphics.BUFFERED_OPTION);
+		rightPanel.setPreferredSize(new Dimension(50, 50));
+		rightPanel.setForeground(Color.BLACK);
+		rightPanel.setBackground(Color.GRAY);
 		rightPanel.setLayout(new BorderLayout(0, 0));
 		rightPanel.add(viewComponentPanel);
-		viewComponentPanel.setVisible(true);
-		rightPanel.setVisible(true);
-		
 		controller.getDocumentViewController().setAnnotationCallback(new org.icepdf.ri.common.MyAnnotationCallback(controller.getDocumentViewController()));
-		
 		frame.getContentPane().add(viewComponentPanel, BorderLayout.CENTER);
 		frame.getContentPane().add(splitPane2, BorderLayout.CENTER);
+		viewComponentPanel.setVisible(true);
+		//controller.openDocument("D:\\dl.pdf");
 		
 	}
 }
