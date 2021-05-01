@@ -1,31 +1,11 @@
 package guiForms;
 
-import java.awt.EventQueue;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-import javax.swing.JFrame;
-import javax.swing.JLayeredPane;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import javax.swing.JButton;
-import javax.swing.SwingConstants;
 
-import org.icepdf.ri.common.SwingController;
-import org.icepdf.ri.common.SwingViewBuilder;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Color;
-import java.awt.Dimension;
-import javax.swing.DebugGraphics;
-import java.awt.ComponentOrientation;
+import customGui.ButtonTabComponent;
 
 public class OneCandyMain {
 	/*
@@ -41,23 +21,21 @@ public class OneCandyMain {
 	final JMenuItem mnuItemServices = new JMenuItem("Services");
 	final JToolBar mainToolBar = new JToolBar();
 	final JButton btnNewButton = new JButton("Sample Button");
-	final JToolBar quickAccessToolBar = new JToolBar();
 	final JToolBar bottomToolBar = new JToolBar();
-	final JPanel fieldsPanel=new JPanel();
-	final JPanel documentTypePanel=new JPanel();
-	final JPanel leftPanel=new JPanel();
-	final JPanel rightPanel=new JPanel();
-	final SwingController controller = new SwingController();
-	final SwingViewBuilder factory = new SwingViewBuilder(controller);
-	final JPanel viewComponentPanel = factory.buildViewerPanel();
-	final JSplitPane centerPanel=new JSplitPane(JSplitPane.VERTICAL_SPLIT,fieldsPanel,documentTypePanel);
-	final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPanel,centerPanel);
-	final JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,splitPane,rightPanel);
-	
+	final JPanel fieldsPanel = new JPanel();
+	final JPanel documentTypePanel = new JPanel();
+	final JTabbedPane leftPanel = new JTabbedPane();
+	final JLayeredPane rightPanel = new JLayeredPane();
+	final JSplitPane centerPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, fieldsPanel, documentTypePanel);
+	final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerPanel);
+	final JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane, rightPanel);
+	private final JPanel navigator = new JPanel();
+	private final JPanel services = new JPanel();
+
 	/**
 	 * Launch the application.
 	 */
-	
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -73,10 +51,15 @@ public class OneCandyMain {
 
 	/**
 	 * Create the application.
+	 * 
+	 * @throws UnsupportedLookAndFeelException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws ClassNotFoundException
 	 */
 	public OneCandyMain() {
 		initialize();
-		
+
 	}
 
 	/**
@@ -90,48 +73,53 @@ public class OneCandyMain {
 				frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			}
 		});
-		
+
 		frame.setBounds(100, 100, 1052, 659);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setJMenuBar(menuBar);		
-		menuBar.add(mnuFiles);		
-		mnuFiles.add(mnuItemNewTask);		
-		menuBar.add(mnuEdit);		
-		menuBar.add(mnuView);		
+		frame.setJMenuBar(menuBar);
+		menuBar.add(mnuFiles);
+		mnuFiles.add(mnuItemNewTask);
+		menuBar.add(mnuEdit);
+		menuBar.add(mnuView);
+
 		leftPanel.setVisible(false);
 		mnuItemNavigator.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				leftPanel.addTab("Navigator", navigator);
+				leftPanel.setTabComponentAt(0, new ButtonTabComponent(leftPanel));
 				leftPanel.setVisible(true);
 				splitPane.setDividerLocation(300);
+				splitPane2.setDividerLocation(700);
 			}
 		});
-		
-		mnuView.add(mnuItemNavigator);		
-		mnuView.add(mnuItemServices);		
+
+		mnuView.add(mnuItemNavigator);
+		mnuItemServices.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				leftPanel.addTab("Services", services);
+				leftPanel.setTabComponentAt(1, new ButtonTabComponent(leftPanel));
+				leftPanel.setVisible(true);
+				splitPane.setDividerLocation(300);
+				splitPane2.setDividerLocation(700);
+			}
+		});
+		mnuView.add(mnuItemServices);
 		frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
 		mainToolBar.add(btnNewButton);
-		quickAccessToolBar.setFloatable(false);
-		quickAccessToolBar.setOrientation(SwingConstants.VERTICAL);
-		frame.getContentPane().add(quickAccessToolBar, BorderLayout.WEST);
-		frame.getContentPane().add(bottomToolBar, BorderLayout.SOUTH);	
+		frame.getContentPane().add(bottomToolBar, BorderLayout.SOUTH);
 		splitPane.setDividerLocation(300);
 		splitPane2.setDividerLocation(500);
-		centerPanel.setDividerLocation(400);
-
-		frame.getContentPane().add(viewComponentPanel);
-		rightPanel.setName("");
-		rightPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		rightPanel.setDebugGraphicsOptions(DebugGraphics.BUFFERED_OPTION);
-		rightPanel.setPreferredSize(new Dimension(50, 50));
-		rightPanel.setForeground(Color.BLACK);
-		rightPanel.setBackground(Color.GRAY);
+		centerPanel.setDividerLocation(300);
+		centerPanel.setMinimumSize(new Dimension(400, 500));
+		rightPanel.setMinimumSize(new Dimension(600, 500));
 		rightPanel.setLayout(new BorderLayout(0, 0));
-		rightPanel.add(viewComponentPanel);
-		controller.getDocumentViewController().setAnnotationCallback(new org.icepdf.ri.common.MyAnnotationCallback(controller.getDocumentViewController()));
-		frame.getContentPane().add(viewComponentPanel, BorderLayout.CENTER);
+
+		JPanel panel = new JPanel();
+		rightPanel.add(panel);
+
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		rightPanel.add(tabbedPane, BorderLayout.NORTH);
 		frame.getContentPane().add(splitPane2, BorderLayout.CENTER);
-		viewComponentPanel.setVisible(true);
-		//controller.openDocument("D:\\dl.pdf");
-		
+
 	}
 }

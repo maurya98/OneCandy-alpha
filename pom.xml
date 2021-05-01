@@ -17,7 +17,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.icepdf.os</groupId>
@@ -30,6 +30,21 @@
 			<artifactId>icepdf-viewer</artifactId>
 			<version>6.2.2</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.itextpdf/itext-asian -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itext-asian</artifactId>
+			<version>5.2.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.23</version>
+		</dependency>
+
 	</dependencies>
- 
+
 </project>
