@@ -5,6 +5,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
 
+import guiForms.OneCandyMain;
+
 /**
  * Component to be used as tabComponent;
  * Contains a JLabel to show the text and 
@@ -16,7 +18,6 @@ import javax.swing.plaf.basic.BasicButtonUI;
  */
 public class ButtonTabComponent extends JPanel {
     
-	private static final long serialVersionUID = -1962233107602190400L;
 	private final JTabbedPane pane;
 
     public ButtonTabComponent(final JTabbedPane pane) {
@@ -51,7 +52,11 @@ public class ButtonTabComponent extends JPanel {
     }
 
     private class TabButton extends JButton implements ActionListener {
-        public TabButton() {
+        /**
+		 * 
+		 */
+
+		public TabButton() {
             int size = 17;
             setPreferredSize(new Dimension(size, size));
             setToolTipText("close this tab");
@@ -80,6 +85,8 @@ public class ButtonTabComponent extends JPanel {
             int j= pane.getComponentCount();
             if(j==1) {
             	pane.setVisible(false);
+            	OneCandyMain.splitPane2.setDividerLocation(500);
+            	
             }
         }
 

@@ -4,8 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-
 import customGui.ButtonTabComponent;
+import customGui.DocumentViewer;
+
+import javax.swing.border.EmptyBorder;
 
 public class OneCandyMain {
 	/*
@@ -20,17 +22,19 @@ public class OneCandyMain {
 	final JMenuItem mnuItemNavigator = new JMenuItem("Navigator");
 	final JMenuItem mnuItemServices = new JMenuItem("Services");
 	final JToolBar mainToolBar = new JToolBar();
-	final JButton btnNewButton = new JButton("Sample Button");
+	final JButton btnSaveTask = new JButton("");
 	final JToolBar bottomToolBar = new JToolBar();
-	final JPanel fieldsPanel = new JPanel();
-	final JPanel documentTypePanel = new JPanel();
-	final JTabbedPane leftPanel = new JTabbedPane();
-	final JLayeredPane rightPanel = new JLayeredPane();
-	final JSplitPane centerPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, fieldsPanel, documentTypePanel);
-	final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerPanel);
-	final JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane, rightPanel);
+	final static JPanel fieldsPanel = new JPanel();
+	final static JPanel documentTypePanel = new JPanel();
+	final static JTabbedPane leftPanel = new JTabbedPane();
+	final static JLayeredPane rightPanel = new JLayeredPane();
+	final static JSplitPane centerPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, fieldsPanel, documentTypePanel);
+	final static JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerPanel);
+	public final static JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane, rightPanel);
 	private final JPanel navigator = new JPanel();
 	private final JPanel services = new JPanel();
+	private final JButton btnDeleteTask = new JButton("");
+	JPanel pdfViewerPanel = new JPanel();
 
 	/**
 	 * Launch the application.
@@ -57,7 +61,7 @@ public class OneCandyMain {
 	 * @throws InstantiationException
 	 * @throws ClassNotFoundException
 	 */
-	public OneCandyMain() {
+	public OneCandyMain() throws Exception {
 		initialize();
 
 	}
@@ -65,7 +69,7 @@ public class OneCandyMain {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize() throws Exception{
 		frame = new JFrame();
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -86,10 +90,10 @@ public class OneCandyMain {
 		mnuItemNavigator.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				leftPanel.addTab("Navigator", navigator);
-				leftPanel.setTabComponentAt(0, new ButtonTabComponent(leftPanel));
+				leftPanel.setTabComponentAt(leftPanel.getTabCount()-1, new ButtonTabComponent(leftPanel));
 				leftPanel.setVisible(true);
 				splitPane.setDividerLocation(300);
-				splitPane2.setDividerLocation(700);
+				splitPane2.setDividerLocation(800);
 			}
 		});
 
@@ -97,15 +101,26 @@ public class OneCandyMain {
 		mnuItemServices.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				leftPanel.addTab("Services", services);
-				leftPanel.setTabComponentAt(1, new ButtonTabComponent(leftPanel));
+				leftPanel.setTabComponentAt(leftPanel.getTabCount()-1, new ButtonTabComponent(leftPanel));
 				leftPanel.setVisible(true);
 				splitPane.setDividerLocation(300);
-				splitPane2.setDividerLocation(700);
+				splitPane2.setDividerLocation(800);
 			}
 		});
 		mnuView.add(mnuItemServices);
 		frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
-		mainToolBar.add(btnNewButton);
+		btnSaveTask.setFocusPainted(false);
+		btnSaveTask.setBorderPainted(false);
+		btnSaveTask.setSelected(true);
+		btnSaveTask.setContentAreaFilled(false);
+		btnSaveTask.setBorder(new EmptyBorder(0, 0, 0, 0));
+		btnSaveTask.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnSaveTask.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\icons\\icons8_save_24px_1.png"));
+		mainToolBar.add(btnSaveTask);
+		btnDeleteTask.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\icons\\icons8_multiply_24px.png"));
+		btnDeleteTask.setActionCommand("");
+		
+		mainToolBar.add(btnDeleteTask);
 		frame.getContentPane().add(bottomToolBar, BorderLayout.SOUTH);
 		splitPane.setDividerLocation(300);
 		splitPane2.setDividerLocation(500);
@@ -114,8 +129,8 @@ public class OneCandyMain {
 		rightPanel.setMinimumSize(new Dimension(600, 500));
 		rightPanel.setLayout(new BorderLayout(0, 0));
 
-		JPanel panel = new JPanel();
-		rightPanel.add(panel);
+		pdfViewerPanel=DocumentViewer.documentViewer("D:\\Aadhar.pdf");
+		rightPanel.add(pdfViewerPanel);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		rightPanel.add(tabbedPane, BorderLayout.NORTH);
