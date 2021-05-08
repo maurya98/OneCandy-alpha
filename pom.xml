@@ -19,6 +19,7 @@
 	</build>
 
 	<dependencies>
+	
 		<dependency>
 			<groupId>org.icepdf.os</groupId>
 			<artifactId>icepdf-core</artifactId>
