@@ -3,6 +3,7 @@ package guiForms;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.awt.AWTKeyStroke;
 
 import customGui.ButtonTabComponent;
 import customGui.DocumentViewer;
@@ -15,14 +16,13 @@ public class OneCandyMain {
 	 */
 	private JFrame frame;
 	final JMenuBar menuBar = new JMenuBar();
-	final JMenu mnuFiles = new JMenu("Files");
+	final JMenu mnuFiles = new JMenu("File");
 	final JMenuItem mnuItemNewTask = new JMenuItem("New Task");
 	final JMenu mnuEdit = new JMenu("Edit");
 	final JMenu mnuView = new JMenu("View");
 	final JMenuItem mnuItemNavigator = new JMenuItem("Navigator");
 	final JMenuItem mnuItemServices = new JMenuItem("Services");
 	final JToolBar mainToolBar = new JToolBar();
-	final JButton btnSaveTask = new JButton("");
 	final JToolBar bottomToolBar = new JToolBar();
 	final static JPanel fieldsPanel = new JPanel();
 	final static JPanel documentTypePanel = new JPanel();
@@ -35,6 +35,7 @@ public class OneCandyMain {
 	private final JPanel services = new JPanel();
 	private final JButton btnDeleteTask = new JButton("");
 	JPanel pdfViewerPanel = new JPanel();
+	private final JButton btnSaveTask = new JButton("");
 
 	/**
 	 * Launch the application.
@@ -81,7 +82,14 @@ public class OneCandyMain {
 		frame.setBounds(100, 100, 1052, 659);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setJMenuBar(menuBar);
+		mnuFiles.setToolTipText("File");
 		menuBar.add(mnuFiles);
+		mnuItemNewTask.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TaskCreator taskCreator = new TaskCreator();
+				taskCreator.setVisible(true);
+			}
+		});
 		mnuFiles.add(mnuItemNewTask);
 		menuBar.add(mnuEdit);
 		menuBar.add(mnuView);
@@ -109,15 +117,11 @@ public class OneCandyMain {
 		});
 		mnuView.add(mnuItemServices);
 		frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
-		btnSaveTask.setFocusPainted(false);
-		btnSaveTask.setBorderPainted(false);
-		btnSaveTask.setSelected(true);
-		btnSaveTask.setContentAreaFilled(false);
-		btnSaveTask.setBorder(new EmptyBorder(0, 0, 0, 0));
+		btnSaveTask.setIcon(new ImageIcon("D:\\EclipseWorkSpace\\OneCandy-alpha\\icons\\icons8_save_24px_1.png"));
 		btnSaveTask.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnSaveTask.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\icons\\icons8_save_24px_1.png"));
+		
 		mainToolBar.add(btnSaveTask);
-		btnDeleteTask.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\icons\\icons8_multiply_24px.png"));
+		btnDeleteTask.setIcon(new ImageIcon("D:\\EclipseWorkSpace\\OneCandy-alpha\\icons\\icons8_multiply_24px.png"));
 		btnDeleteTask.setActionCommand("");
 		
 		mainToolBar.add(btnDeleteTask);
@@ -129,7 +133,7 @@ public class OneCandyMain {
 		rightPanel.setMinimumSize(new Dimension(600, 500));
 		rightPanel.setLayout(new BorderLayout(0, 0));
 
-		pdfViewerPanel=DocumentViewer.documentViewer("D:\\Aadhar.pdf");
+		pdfViewerPanel=DocumentViewer.documentViewer("");
 		rightPanel.add(pdfViewerPanel);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
