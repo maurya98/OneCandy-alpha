@@ -133,7 +133,7 @@ public class OneCandyMain {
 		rightPanel.setMinimumSize(new Dimension(600, 500));
 		rightPanel.setLayout(new BorderLayout(0, 0));
 
-		pdfViewerPanel=DocumentViewer.documentViewer("");
+		pdfViewerPanel=DocumentViewer.documentViewer("D:\\Aadhar.pdf");
 		rightPanel.add(pdfViewerPanel);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
