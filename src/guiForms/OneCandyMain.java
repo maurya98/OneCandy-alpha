@@ -2,6 +2,8 @@ package guiForms;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+
 import javax.swing.*;
 import java.awt.AWTKeyStroke;
 
@@ -36,6 +38,7 @@ public class OneCandyMain {
 	private final JButton btnDeleteTask = new JButton("");
 	JPanel pdfViewerPanel = new JPanel();
 	private final JButton btnSaveTask = new JButton("");
+	JTabbedPane imageViewerPanel = new JTabbedPane(JTabbedPane.TOP);
 
 	/**
 	 * Launch the application.
@@ -70,7 +73,7 @@ public class OneCandyMain {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() throws Exception{
+	private void initialize() throws Exception {
 		frame = new JFrame();
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -86,8 +89,8 @@ public class OneCandyMain {
 		menuBar.add(mnuFiles);
 		mnuItemNewTask.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TaskCreator taskCreator = new TaskCreator();
-				taskCreator.setVisible(true);
+				FrmTaskCreator frmTaskCreator = new FrmTaskCreator();
+				frmTaskCreator.setVisible(true);
 			}
 		});
 		mnuFiles.add(mnuItemNewTask);
@@ -98,7 +101,7 @@ public class OneCandyMain {
 		mnuItemNavigator.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				leftPanel.addTab("Navigator", navigator);
-				leftPanel.setTabComponentAt(leftPanel.getTabCount()-1, new ButtonTabComponent(leftPanel));
+				leftPanel.setTabComponentAt(leftPanel.getTabCount() - 1, new ButtonTabComponent(leftPanel));
 				leftPanel.setVisible(true);
 				splitPane.setDividerLocation(300);
 				splitPane2.setDividerLocation(800);
@@ -109,7 +112,7 @@ public class OneCandyMain {
 		mnuItemServices.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				leftPanel.addTab("Services", services);
-				leftPanel.setTabComponentAt(leftPanel.getTabCount()-1, new ButtonTabComponent(leftPanel));
+				leftPanel.setTabComponentAt(leftPanel.getTabCount() - 1, new ButtonTabComponent(leftPanel));
 				leftPanel.setVisible(true);
 				splitPane.setDividerLocation(300);
 				splitPane2.setDividerLocation(800);
@@ -119,26 +122,44 @@ public class OneCandyMain {
 		frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
 		btnSaveTask.setIcon(new ImageIcon("D:\\EclipseWorkSpace\\OneCandy-alpha\\icons\\icons8_save_24px_1.png"));
 		btnSaveTask.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
+
 		mainToolBar.add(btnSaveTask);
 		btnDeleteTask.setIcon(new ImageIcon("D:\\EclipseWorkSpace\\OneCandy-alpha\\icons\\icons8_multiply_24px.png"));
 		btnDeleteTask.setActionCommand("");
-		
+
 		mainToolBar.add(btnDeleteTask);
 		frame.getContentPane().add(bottomToolBar, BorderLayout.SOUTH);
+		
 		splitPane.setDividerLocation(300);
 		splitPane2.setDividerLocation(500);
 		centerPanel.setDividerLocation(300);
 		centerPanel.setMinimumSize(new Dimension(400, 500));
 		rightPanel.setMinimumSize(new Dimension(600, 500));
 		rightPanel.setLayout(new BorderLayout(0, 0));
-
-		pdfViewerPanel=DocumentViewer.documentViewer("D:\\Aadhar.pdf");
+		rightPanel.add(imageViewerPanel, BorderLayout.NORTH);
+		pdfViewerPanel = DocumentViewer.documentViewer("");
 		rightPanel.add(pdfViewerPanel);
-
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		rightPanel.add(tabbedPane, BorderLayout.NORTH);
 		frame.getContentPane().add(splitPane2, BorderLayout.CENTER);
 
+	}
+
+	/*
+	 * Enter file
+	 */
+	public void setDocumentToPanel(File file) {
+		try {
+			if (file.getAbsolutePath().endsWith("pdf")) {
+				System.out.print(file.getAbsolutePath());
+				pdfViewerPanel = DocumentViewer.documentViewer(file.getAbsolutePath());
+				pdfViewerPanel.setVisible(true);
+				imageViewerPanel.setVisible(false);
+			}else {
+				imageViewerPanel.setVisible(true);
+				pdfViewerPanel.setVisible(false);
+				
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage());
+		}
 	}
 }
