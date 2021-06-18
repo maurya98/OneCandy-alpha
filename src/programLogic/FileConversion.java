@@ -1,30 +1,26 @@
 package programLogic;
 
-
+import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 
-import org.apache.commons.io.FileUtils;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageDecoder;
-import com.sun.media.jai.codec.TIFFDecodeParam;
-
+import org.apache.pdfbox.contentstream.PDContentStream;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 /*author
  * Saurabh Kumar Maurya 
@@ -32,152 +28,198 @@ import com.sun.media.jai.codec.TIFFDecodeParam;
  */
 
 public class FileConversion {
-	
-	public static final String FILE_SEPRATOR = System.getProperty("file.separator");
-	public JProgressBar jb;
-	public static String logpath = null;
-	public String logmessage = null;
-	
-	public void Tiff2Pdf(String path) throws IOException {		
-		      try {
-	
-		        File fileSrc = new File(path);							//Get the source directory from JFileChooser
-		       
-		        //Log Path 
-		        logpath = path + "/log.txt";
-		        LogCreator.logwriter("Process Started ",logpath);
-		        
-		        //Extensions to filter tif file
-				String[] tif_exts = new String[] { "tiff" ,"tif"};
-		        
-				//Used to list all directory with contain tif image
-				List<File> files = (List<File>) FileUtils.listFiles(fileSrc, tif_exts, true);
-				
-				System.out.println(" File count  : " +files.size());
+	/*
+	 * File file = jpg || jpeg || png || gif || bmp || tiff || tif
+	 * These extensions are allowed in the File
+	 * Single File at a time
+	 * return type will be in PDF format
+	 * eg: 
+	 * PDDocument document=convertToPDF(file);
+	 * document.save("path to save the file");
+	 * document.close();  
+	 */
+	public PDDocument convertToPDF(File file) throws IOException {
+		String extension = "";
+		int index = file.getAbsolutePath().lastIndexOf(".");
+		if (index > 0) {
+			extension = file.getAbsolutePath().substring(index + 1);
+		}
+		if (extension.equals("jpg") || extension.equals("jpeg")) {
+			FileInputStream in = new FileInputStream(file);
+			BufferedImage image = ImageIO.read(file);
 
-			    
-				int count = 0;
-				 
-				//Loop start to fetch all tif to convert PDF
+			PDDocument document = new PDDocument();
+			PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
+			document.addPage(page);
+			PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, image);
+			// PDImageXObject pdImageXObject = JPEGFactory.createFromImage(document, image);
+			PDPageContentStream contents = new PDPageContentStream(document, page);
+			contents.drawImage(pdImageXObject, 20, 20);
+			contents.close();
+
+			System.out.println("Completed");
+			return document;
+
+		} else if (extension.equals("tiff") || extension.equals("tif")) {
+			ImageInputStream imageInputStream = ImageIO.createImageInputStream(file);
+			Iterator<ImageReader> it = ImageIO.getImageReaders(imageInputStream);
+			if (it == null || !it.hasNext()) {
+				throw new IOException("Image File Format Not Supported by ImageIO : " + file.getAbsolutePath());
+			}
+			ImageReader reader = (ImageReader) it.next();
+			it = null;
+			reader.setInput(imageInputStream);
+
+			// Number of Pages
+			System.out.println(reader.getNumImages(true));
+
+			// to read image separately
+			// reader.read(index);
+
+			// Create a new pdfdocument
+			PDDocument document = new PDDocument();
+			// For adding pages to pdf
+			PDPageContentStream contents;
+			for (int i = 0; i < reader.getNumImages(true); i++) {
+				PDImageXObject pdImage;
+				// System.out.println("Width : "+reader.read(i).getWidth()+" | Height :
+				// "+reader.read(i).getHeight());
+				// Create page size as that of image
+				PDPage page = new PDPage(new PDRectangle(reader.read(i).getWidth(), reader.read(i).getHeight()));
+				// Create pages of A4 size
+				// PDPage page = new PDPage(new PDRectangle(2480,3508));
+				document.addPage(page);
+				pdImage = LosslessFactory.createFromImage(document, reader.read(i));
+				contents = new PDPageContentStream(document, page);
+				// draw the image at full size at (x=20, y=20)
+				contents.drawImage(pdImage, 20, 20);
+				contents.close();
+			}
+			// document.save("D:\\pdfbox\\Demo.pdf");
+			// document.close();
+
+			System.out.println("Completed");
+			return document;
+
+		} else if (extension.equals("png") || extension.equals("bmp") || extension.equals(".gif")) {
+			FileInputStream in = new FileInputStream(file);
+			BufferedImage image = ImageIO.read(file);
+
+			PDDocument document = new PDDocument();
+			PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
+			document.addPage(page);
+			PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, image);
+			// PDImageXObject pdImageXObject = JPEGFactory.createFromImage(document, image);
+			PDPageContentStream contents = new PDPageContentStream(document, page);
+			contents.drawImage(pdImageXObject, 20, 20);
+			contents.close();
+
+			System.out.println("Completed");
+			return document;
+		}
+		return null;
+	}
+
+	/*
+	 * ArrayList file = {jpg ,jpeg ,png ,gif ,bmp ,tiff ,tif}
+	 * These extensions are allowed in the array list
+	 * This arrayList can be heterogeneous or homogeneous in nature
+	 * return type will be in PDF format
+	 * eg: 
+	 * PDDocument document=convertToPDF(file);
+	 * document.save("path to save the file");
+	 * document.close();  
+	 */
+	public PDDocument convertToPDF(ArrayList<File> file) throws Exception {
+		String extension = "";
+		PDDocument document = new PDDocument();
+		PDPage page;
+		PDPageContentStream contents = null;
+		PDImageXObject pdImageXObject;
+		for (int lcount = 0; lcount < file.size(); lcount++) {
+			int index = file.get(lcount).getAbsolutePath().lastIndexOf(".");
+			if (index > 0) {
+				extension = file.get(lcount).getAbsolutePath().substring(index + 1);
+			}else {
+				throw new Exception("File invalid or corrupted");
+			}
+			if(extension.equals("jpg") || extension.equals("jpeg")) {
 				
-				for (File file : files) {
-				 
-					count +=1;					 
-					
-					String destFileName = file.getName().substring(0, file.getName().lastIndexOf("."))+".pdf";
-					
-					String srcFile = file.getCanonicalPath();
-					String destFile = file.getParent()+FILE_SEPRATOR+destFileName;
-					
-					logmessage = count +". Source Path : "+ srcFile +"     Destignation Path : "+destFile;
-					LogCreator.logwriter(logmessage,logpath);
-					
-					//Check whether File converted to PDF 
-					File pdfFiles = new File(destFile);
-					if(!pdfFiles.exists()){
-						convertStart(srcFile,destFile);
-					}
-					 
+				FileInputStream inputStream = new FileInputStream(file.get(lcount));
+				BufferedImage image = ImageIO.read(inputStream);
+				page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
+				document.addPage(page);
+				pdImageXObject = LosslessFactory.createFromImage(document, image);
+				// PDImageXObject pdImageXObject = JPEGFactory.createFromImage(document, image);
+				contents = new PDPageContentStream(document, page);
+				contents.drawImage(pdImageXObject, 20, 20);
+
+			}else if (extension.equals("tiff") || extension.equals("tif")) {
+				ImageInputStream imageInputStream = ImageIO.createImageInputStream(file.get(lcount));
+				Iterator<ImageReader> it = ImageIO.getImageReaders(imageInputStream);
+				if (it == null || !it.hasNext()) {
+					throw new Exception("Image File Format Not Supported by ImageIO : " + file.get(lcount).getAbsolutePath());
 				}
-				
-				LogCreator.logwriter("Process Completed ",logpath);
-				JOptionPane.showMessageDialog(null, "Completed");
-				
-				
-		      } catch (ArrayIndexOutOfBoundsException e) {
-		    	  LogCreator.logwriter("Error : "+e.toString(),logpath);  
-		          JOptionPane.showMessageDialog(null, " Please try again");
-		      }
+				ImageReader reader = (ImageReader) it.next();
+				it = null;
+				reader.setInput(imageInputStream);
+				// Number of Pages
+				//System.out.println(reader.getNumImages(true));
+
+				// to read image separately
+				// reader.read(index);
+				for (int i = 0; i < reader.getNumImages(true); i++) {
+					
+					// System.out.println("Width : "+reader.read(i).getWidth()+" | Height :
+					// "+reader.read(i).getHeight());
+					// Create page size as that of image
+					page = new PDPage(new PDRectangle(reader.read(i).getWidth(), reader.read(i).getHeight()));
+					// Create pages of A4 size
+					// PDPage page = new PDPage(new PDRectangle(2480,3508));
+					document.addPage(page);
+					pdImageXObject = LosslessFactory.createFromImage(document, reader.read(i));
+					contents = new PDPageContentStream(document, page);
+					// draw the image at full size at (x=20, y=20)
+					contents.drawImage(pdImageXObject, 20, 20);
+					contents.close();
+				}
+				// document.save("D:\\pdfbox\\Demo.pdf");
+				// document.close();
+
+			} else if (extension.equals("png") || extension.equals("bmp") || extension.equals(".gif")) {
+				FileInputStream in = new FileInputStream(file.get(lcount));
+				BufferedImage image = ImageIO.read(in);
+
+				page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
+				document.addPage(page);
+				pdImageXObject = LosslessFactory.createFromImage(document, image);
+				// PDImageXObject pdImageXObject = JPEGFactory.createFromImage(document, image);
+				contents = new PDPageContentStream(document, page);
+				contents.drawImage(pdImageXObject, 20, 20);
+			}
+			else {
+				System.out.print("File Extension Not Supported : "+ extension);
+			}
+		}
+		contents.close();
+		return document;
 	}
 	
-	public boolean convertStart(String sourcefile,String targetfile) throws IOException{			
-        
-        try {
-        	
-        	 float width = 2480;
-             float height = 3508;
-             
-             Rectangle rect = new Rectangle(width,height);
-             
-	         //PDF conversation starts here 
-             Document document = new Document(rect);
-	    	    
-	    	 FileOutputStream fos = new FileOutputStream(targetfile);
-	    	 PdfWriter writer = PdfWriter.getInstance(document, fos);	   
-	    	 writer.open();
-	    	 document.open();
-	    	 
-        	 Iterator readers=javax.imageio.ImageIO.getImageReadersBySuffix("tiff");
-        	  
-        	  if (readers.hasNext()) {
-        		  
-        		  File srcFile=new File(sourcefile);
-        		  
-        		  ImageInputStream iis=javax.imageio.ImageIO.createImageInputStream(srcFile);
-      		      TIFFDecodeParam param=null;
-      		      ImageDecoder dec=ImageCodec.createImageDecoder("tiff",srcFile,param);
-    		      int pageCount=dec.getNumPages();
-    		      ImageReader _imageReader=(ImageReader)(readers.next());
-        		  
-    		      if (_imageReader != null) {
-    		    	  
-    			      _imageReader.setInput(iis,true);
-    			      
-    			      for (int i=0; i < pageCount; i++) {
-	    			    	//Read the source file (tiff)
-	    		        	  BufferedImage srcImg = _imageReader.read(i);  
-	    		        	  BufferedImage img2 = new BufferedImage(srcImg.getWidth(), srcImg.getHeight(), 
-	    	        				  BufferedImage.TYPE_INT_RGB);
-	    		        	  	    	        	    
-	    		        	
-	    	        		//Set the RGB values for converted image (jpg)
-	    	        	    for(int y = 0; y < srcImg.getHeight(); y++) {
-	    	        	      for(int x = 0; x < srcImg.getWidth(); x++) {
-	    	        	        img2.setRGB(x, y, srcImg.getRGB(x, y));
-	    	        	      }
-	    	        	    }
-	    	        	  /*  
-	    	        	    String s = "C:/Users/shrisowdhaman/Desktop/TIFF/A-04-000001/sample"+i+".jpg";
-	    	        	    ImageIO.write(img2, "jpg", new File(s));
-	    	        	    */
-	    	        	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    	        	    ImageIO.write(img2, "jpg", baos);
-	    	        	    baos.flush();
-	    	
-	    	        	    // Convert byteArrayoutputSteam to ByteArray
-	    	        	    byte[] imageInByte = baos.toByteArray();
-	    	        	    
-	    	        	    
-	    	        	    document.add(Image.getInstance(imageInByte));
-	    	        	   
-	    	        	    System.out.println("Page: " + (i + 1)  );
-	    	        	    baos.close();
-	    	        	    
-    			      }//End of for loop
-    			      
-    			    //Close all open methods
-  	        	    document.close();
-  	        	    writer.close();
-  	        	    fos.close();
-  	        	   
-    		      }else{
-	        		  LogCreator.logwriter("Image is null for file :" + targetfile,logpath); 
-	        	      return false;
-	        	  }
-        	  }
-        	} catch (Exception e) {
-        		LogCreator.logwriter("Error : "+e.getMessage().toString(), logpath);
-        		return false;
-        	}
-
-          return true;
-	}
-	
-	 
-	public static void main(String[] args) throws IOException {
-		 FileConversion fc=new FileConversion();
-		 fc.Tiff2Pdf("D:\\NEWGEN\\");
-
+	public File convertToJPEG(File file) {
+		String extension = "";
+		int index = file.getAbsolutePath().lastIndexOf(".");
+		if (index > 0) {
+			extension = file.getAbsolutePath().substring(index + 1);
+		}
+		
+		return null;
 	}
 
+	public static void main(String args[]) throws IOException {
+		File file = new File("D:\\Personal\\me.jpg");
+		FileConversion fc = new FileConversion();
+		PDDocument document = new PDDocument();
+		document = fc.convertToPDF(file);
+		document.save("D:\\pdfbox\\demo.pdf");
+	}
 }
