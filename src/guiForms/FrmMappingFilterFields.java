@@ -1,33 +1,28 @@
 package guiForms;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JComboBox;
 import java.awt.Font;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import java.awt.Dialog.ModalExclusionType;
-import java.awt.Dialog.ModalityType;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class FrmMappingFilterFields extends JDialog {
@@ -41,7 +36,7 @@ public class FrmMappingFilterFields extends JDialog {
 	public static void main(String[] args) {
 		try {
 			FrmMappingFilterFields dialog = new FrmMappingFilterFields();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setDefaultCloseOperation(dialog.EXIT_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -57,7 +52,6 @@ public class FrmMappingFilterFields extends JDialog {
 	JButton btnNewButton = new JButton(">");
 	JButton btnNewButton_1 = new JButton("<");
 	JButton btnDelete = new JButton("Delete");
-	JButton btnModify = new JButton("Modify");
 	JComboBox dataFieldCombo = new JComboBox();
 	JComboBox pickListValues = new JComboBox();
 	private final JPanel contentPanel = new JPanel();
@@ -69,6 +63,7 @@ public class FrmMappingFilterFields extends JDialog {
 	private final JList list = new JList(dlmAllDataField);
 	DefaultListModel dlmSelectedDataFields = new DefaultListModel();
 	private final JList list_1 = new JList(dlmSelectedDataFields);
+	//Map<String,Object> mtableValue=new LinkedHashMap<String, Object>();
 	
 	/*
 	 * Variable declaration
@@ -76,8 +71,9 @@ public class FrmMappingFilterFields extends JDialog {
 	
 	static Map<String,ArrayList<String>> comboValues = new LinkedHashMap<String, ArrayList<String>>();
 	static int rows=0;
-	DefaultTableModel dtmTableModel;
+	static DefaultTableModel dtmTableModel;
 	private final JTable table = new JTable();
+	private final JButton btnSaveExit = new JButton("Save & Exit");
 	/******************************************************************************************************************/
 
 	/**
@@ -85,6 +81,8 @@ public class FrmMappingFilterFields extends JDialog {
 	 */
 
 	public FrmMappingFilterFields() {
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setResizable(false);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -114,6 +112,11 @@ public class FrmMappingFilterFields extends JDialog {
 
 		lblNewLabel_1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		contentPanel.add(lblNewLabel_1);
+		pickListValues.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				pickListValueItemStateChanged(e);
+			}
+		});
 		pickListValues.setBounds(90, 45, 307, 25);
 
 		pickListValues.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -154,23 +157,14 @@ public class FrmMappingFilterFields extends JDialog {
 
 		btnAdd.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		contentPanel.add(btnAdd);
-		btnDelete.setBounds(307, 533, 90, 25);
+		btnDelete.setBounds(203, 533, 90, 25);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				btnDeleteActionPerformed(e);
 			}
 		});
 		btnDelete.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		contentPanel.add(btnDelete);
-		btnModify.setBounds(207, 338, 90, 25);
-		
-		btnModify.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				btnModifyActionPerformed(e);
-			}
-		});
-		btnModify.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		contentPanel.add(btnModify);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
 		scrollPane_2.setBounds(10, 374, 387, 149);
@@ -178,12 +172,23 @@ public class FrmMappingFilterFields extends JDialog {
 		scrollPane_2.setViewportView(table);
 		dtmTableModel = new DefaultTableModel();
 		table.setModel(dtmTableModel);
+		btnSaveExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnSaveExitActionPerformed(e);
+			}
+		});
+		btnSaveExit.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		btnSaveExit.setBounds(303, 533, 94, 25);
+		
+		contentPanel.add(btnSaveExit);
 		dtmTableModel.addColumn("DataFields");
 		dtmTableModel.addColumn("Value");
 		dtmTableModel.addColumn("Associate Fields");
 		
 	}
 	
+	
+
 	/***************************************************************************************************************************************/
 	
 	/*
@@ -191,15 +196,16 @@ public class FrmMappingFilterFields extends JDialog {
 	 */
 	
 	protected void mappingWindowOpened(java.awt.event.WindowEvent e) {
+		dataFieldCombo.removeAllItems();
 		comboValues = FrmTaskCreator.getDataFieldsWithPickList();
 		Iterator iterator= comboValues.entrySet().iterator();
 		while(iterator.hasNext()) {
 			 Map.Entry<String,ArrayList<String>> entry = (Map.Entry<String,ArrayList<String>>) iterator.next();
 			 dataFieldCombo.addItem(entry.getKey());
 		}
-		for(int i=0;i<FrmTaskCreator.dsDataSection.size();i++) {
-			dlmAllDataField.addElement(FrmTaskCreator.dsDataSection.get(i).getDataFieldName());
-		}
+//		for(int i=0;i<FrmTaskCreator.dsDataSection.size();i++) {
+//			dlmAllDataField.addElement(FrmTaskCreator.dsDataSection.get(i).getDataFieldName());
+//		}
 		
 	}
 	protected void changeValue(ItemEvent e) {
@@ -211,15 +217,12 @@ public class FrmMappingFilterFields extends JDialog {
 	}
 	
 	public void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
-		dtmTableModel.addRow(new Object[] {dataFieldCombo.getSelectedItem(),pickListValues.getSelectedItem(),""});
+		dtmTableModel.addRow(new Object[] {dataFieldCombo.getSelectedItem(),pickListValues.getSelectedItem(),list_1.getModel()});
 	}
 	
-	public void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
-		
-	}
 	
 	public void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
-		
+		dtmTableModel.removeRow(table.getSelectedRow());
 	}
 	
 	public void btnCopyToList2ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -241,5 +244,26 @@ public class FrmMappingFilterFields extends JDialog {
 		for(int i=0;i<dlmAllDataField.getSize();i++) {
 			dlmSelectedDataFields.removeElement(dlmAllDataField.getElementAt(i));
 		}
+	}
+	
+	public void btnSaveExitActionPerformed(ActionEvent e) {
+			this.dispose();
+	}
+	
+	/*
+	 * Pick List value changed
+	 * All the values in the List should get reset!
+	 */
+	public void pickListValueItemStateChanged(java.awt.event.ItemEvent evt) {
+		dlmAllDataField.removeAllElements();
+		dlmSelectedDataFields.removeAllElements();
+		comboValues = FrmTaskCreator.getDataFieldsWithPickList();
+		Iterator iterator= comboValues.entrySet().iterator();
+		for(int i=0;i<FrmTaskCreator.dsDataSection.size();i++) {
+			dlmAllDataField.addElement(FrmTaskCreator.dsDataSection.get(i).getDataFieldName());
+		}
+	}
+	public static DefaultTableModel getTableModel() {
+		return dtmTableModel;
 	}
 }

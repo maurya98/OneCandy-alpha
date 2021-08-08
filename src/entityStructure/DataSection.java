@@ -4,33 +4,37 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.swing.table.DefaultTableModel;
+
 public class DataSection {
 	private String sDataFieldName;
 	private String sDataType;
 	private ArrayList<String> arrLPickListValue;
 	private String sDefaultValue;
+	private String sJunkCharacter;
 	private boolean bMandatory;
 	private boolean bCarryForward;
 	private boolean bReadOnly;
 	private boolean bPrimary;
 	private boolean bUnique;
 	private boolean bMultilLine;
-	private Map<String, ArrayList<String>> mFilterFields;
+	private DefaultTableModel dtmFilterFields;
 	Map<String, Object> dsDataSection = new LinkedHashMap<String, Object>();
 	
-	public void associateValue(String sDataFieldName, String sDataType, ArrayList<String> arrLPickListValue, String sDefaultValue, boolean bCarryForward,
-			boolean bMandatory, boolean bReadOnly, boolean bPrimary, boolean bUnique, boolean bMultilLine, Map<String, ArrayList<String>> mFilterFields) {
+	public void associateValue(String sDataFieldName, String sDataType, ArrayList<String> arrLPickListValue, String sDefaultValue,String sJunkCharacter, boolean bCarryForward,
+			boolean bMandatory, boolean bReadOnly, boolean bPrimary, boolean bUnique, boolean bMultilLine, DefaultTableModel mFilterFields) {
 		this.sDataFieldName = sDataFieldName;
 		this.sDataType=sDataType;
 		this.arrLPickListValue=arrLPickListValue;
 		this.sDefaultValue=sDefaultValue;
+		this.sJunkCharacter=sJunkCharacter;
 		this.bMandatory=bMandatory;
 		this.bCarryForward=bCarryForward;
 		this.bReadOnly=bReadOnly;
 		this.bPrimary=bPrimary;
 		this.bUnique=bUnique;
 		this.bMultilLine=bMultilLine;
-		this.mFilterFields=mFilterFields;
+		this.dtmFilterFields=mFilterFields;
 		
 	}
 
@@ -64,6 +68,14 @@ public class DataSection {
 
 	public void setDefaultValue(String sDefaultValue) {
 		this.sDefaultValue = sDefaultValue;
+	}
+
+	public String getJunkCharacter() {
+		return sJunkCharacter;
+	}
+
+	public void setJunkCharacter(String sJunkCharacter) {
+		this.sJunkCharacter = sJunkCharacter;
 	}
 
 	public boolean isMandatory() {
@@ -114,12 +126,12 @@ public class DataSection {
 		this.bMultilLine = bMultilLine;
 	}
 
-	public Map<String, ArrayList<String>> getFilterFields() {
-		return mFilterFields;
+	public DefaultTableModel getFilterFields() {
+		return dtmFilterFields;
 	}
 
-	public void setFilterFields(Map<String, ArrayList<String>> mFilterFields) {
-		this.mFilterFields = mFilterFields;
+	public void setFilterFields(DefaultTableModel mFilterFields) {
+		this.dtmFilterFields = dtmFilterFields;
 	}
 
 	public Map<String, Object> getDataSection() {

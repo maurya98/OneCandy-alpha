@@ -12,17 +12,14 @@ import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.table.DefaultTableModel;
 
 import entityStructure.DataSection;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import net.miginfocom.swing.MigLayout;
 
-public class FrmTaskCreator extends JDialog {
-
-	
-	private static final long serialVersionUID = 1L;
-	
+public class FrmTaskCreator extends JDialog {	
 
 	/**
 	 * Launch the application.
@@ -46,7 +43,6 @@ public class FrmTaskCreator extends JDialog {
 	private JButton btnAddDocument = new JButton("Add");
 	private JButton btnAddNewDataField = new JButton("Add");
 	private JButton btnAddValueToPickList = new JButton("Add Value");
-	private JButton btnAdvance = new JButton("Advance");
 	private JButton btnBackToDataSection = new JButton("Back");
 	private JButton btnBackToTaskNamePanel = new JButton("Back");
 	private JButton btnBrowseLocation = new JButton("Browse");
@@ -92,13 +88,12 @@ public class FrmTaskCreator extends JDialog {
 	private JComboBox<String> dataTypeCombo = new JComboBox<String>();
 	private JComboBox<String> folderIdentifierCombo = new JComboBox<String>();
 	private JComboBox<String> formatTypecCombo = new JComboBox<String>();
-	private JComboBox<String> fromDocCombo = new JComboBox<String>();
+	private JComboBox<String> comboFromDoc = new JComboBox<String>();
 	static JComboBox<String> pickListCombo = new JComboBox<String>();
 	
 	private JLabel lblNewLabel = new JLabel("Task Name");
 	private JLabel lblNewLabel_1 = new JLabel("Task Location");
 	private JLabel lblNewLabel_10 = new JLabel("y2");
-	private JLabel lblNewLabel_11 = new JLabel("Get String");
 	private JLabel lblNewLabel_12 = new JLabel("From Doc:");
 	private JLabel lblNewLabel_13 = new JLabel("Folder Name:");
 	private JLabel lblNewLabel_14 = new JLabel("Folder Identifier");
@@ -126,7 +121,7 @@ public class FrmTaskCreator extends JDialog {
 	private JPanel panel_5 = new JPanel();
 	private JPanel panel_7 = new JPanel();
 	private JPanel panel_8 = new JPanel();
-	private JPanel txtGetString = new JPanel();
+	private JPanel panelGetString = new JPanel();
 	private JPanel taskNamePanel = new JPanel();
 	private JPanel dataSectionPanel = new JPanel();
 	private JPanel docTypePanel = new JPanel();
@@ -144,7 +139,6 @@ public class FrmTaskCreator extends JDialog {
 	private JSpinner spinner = new JSpinner();
 	
 	private JTextField textField_10 = new JTextField();
-	private JTextField textField_5 = new JTextField();
 	private JTextField textField_6 = new JTextField();
 	private JTextField textField_7 = new JTextField();
 	private JTextField textField_8 = new JTextField();
@@ -168,13 +162,12 @@ public class FrmTaskCreator extends JDialog {
 	int flagForUniqueValues=0;
 	
 	FrmPicklistDS frmPickListDS;
-	FrmMappingFilterFields frmMappingFilterFields = new FrmMappingFilterFields();
-	FrmAdvanceDS frmAdvanceDS= new FrmAdvanceDS();
-	
+
 	DataSection objDataSection;
 	static ArrayList<DataSection> dsDataSection = new ArrayList<DataSection>();
 	
 	static DefaultListModel<String> dataSectionPickList = new DefaultListModel<String>();
+	private JTextField txtJunkCharacter;
 	public static DefaultListModel<String> getDataSectionPickList() {
 		return dataSectionPickList;
 	}
@@ -261,7 +254,7 @@ public class FrmTaskCreator extends JDialog {
 		dataSectionPanel.setLayout(null);
 
 		panel_2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_2.setBounds(184, 10, 393, 284);
+		panel_2.setBounds(184, 10, 393, 321);
 		dataSectionPanel.add(panel_2);
 		lblNewLabel_3.setBounds(9, 9, 102, 25);
 		lblNewLabel_3.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -317,7 +310,7 @@ public class FrmTaskCreator extends JDialog {
 		panel_2.add(pickListCombo);
 		panel_2.add(chkDefaultValue);
 		panel_2.add(txtDefaultValue);
-		btnAddNewDataField.setBounds(297, 247, 87, 25);
+		btnAddNewDataField.setBounds(293, 286, 90, 25);
 
 		btnAddNewDataField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -326,7 +319,7 @@ public class FrmTaskCreator extends JDialog {
 		});
 		btnAddNewDataField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(btnAddNewDataField);
-		btnDeleteDataField.setBounds(196, 247, 86, 25);
+		btnDeleteDataField.setBounds(199, 286, 90, 25);
 		btnDeleteDataField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnDeleteDataFieldsActionPerformed(e);
@@ -334,13 +327,13 @@ public class FrmTaskCreator extends JDialog {
 		});
 		btnDeleteDataField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(btnDeleteDataField);
-		chkMandatory.setBounds(9, 126, 102, 25);
+		chkMandatory.setBounds(72, 159, 102, 25);
 		chkMandatory.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(chkMandatory);
-		chkCarryForward.setBounds(123, 128, 99, 25);
+		chkCarryForward.setBounds(186, 161, 99, 25);
 		chkCarryForward.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(chkCarryForward);
-		chkPrimary.setBounds(9, 157, 102, 25);
+		chkPrimary.setBounds(72, 190, 102, 25);
 		chkPrimary.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(chkPrimary.isSelected()) {
@@ -356,13 +349,13 @@ public class FrmTaskCreator extends JDialog {
 		});
 		chkPrimary.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(chkPrimary);
-		chkUnique.setBounds(123, 159, 99, 25);
+		chkUnique.setBounds(186, 192, 99, 25);
 		chkUnique.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(chkUnique);
-		chkReadOnly.setBounds(242, 126, 79, 25);
+		chkReadOnly.setBounds(305, 159, 79, 25);
 		chkReadOnly.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(chkReadOnly);
-		panel_4.setBounds(9, 188, 375, 55);
+		panel_4.setBounds(9, 221, 375, 55);
 		panel_4.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(panel_4);
 		panel_4.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Additional",
@@ -391,19 +384,10 @@ public class FrmTaskCreator extends JDialog {
 
 		btnMapFields.setBounds(111, 15, 90, 25);
 		panel_4.add(btnMapFields);
-		btnAdvance.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				btnAdvanceActionPerformed(e);
-			}
-		});
-		btnAdvance.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-		btnAdvance.setBounds(211, 15, 90, 25);
-		panel_4.add(btnAdvance);
-		chkMultiLine.setBounds(242, 157, 77, 25);
+		chkMultiLine.setBounds(305, 190, 77, 25);
 		chkMultiLine.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.add(chkMultiLine);
-		btnClearValue.setBounds(121, 247, 59, 25);
+		btnClearValue.setBounds(105, 286, 90, 25);
 		btnClearValue.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				clearDataSectionFields();
@@ -412,6 +396,17 @@ public class FrmTaskCreator extends JDialog {
 		btnClearValue.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		
 		panel_2.add(btnClearValue);
+		
+		JLabel lblNewLabel_3_2 = new JLabel("Junk Characters");
+		lblNewLabel_3_2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		lblNewLabel_3_2.setBounds(9, 128, 102, 25);
+		panel_2.add(lblNewLabel_3_2);
+		
+		txtJunkCharacter = new JTextField();
+		txtJunkCharacter.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		txtJunkCharacter.setColumns(10);
+		txtJunkCharacter.setBounds(123, 128, 261, 25);
+		panel_2.add(txtJunkCharacter);
 
 		btnBackToTaskNamePanel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnBackToTaskNamePanel.setMinimumSize(new Dimension(90, 25));
@@ -434,13 +429,14 @@ public class FrmTaskCreator extends JDialog {
 		btnCancelOnDataSectionPanel.setBounds(487, 426, 90, 25);
 		dataSectionPanel.add(btnCancelOnDataSectionPanel);
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_1.setBounds(10, 10, 164, 441);
+		panel_1.setBounds(10, 10, 164, 410);
 				
 		dataSectionPanel.add(panel_1);
 		panel_1.setLayout(null);
-		scrollPane.setBounds(10, 10, 144, 421);
+		scrollPane.setBounds(10, 10, 144, 387);
 				
 		panel_1.add(scrollPane);
+		dataFieldList.setValueIsAdjusting(true);
 		dataFieldList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -452,6 +448,26 @@ public class FrmTaskCreator extends JDialog {
 		scrollPane.setViewportView(dataFieldList);
 				
 		dataFieldList.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		
+		JButton btnUpDSList = new JButton("Up");
+		btnUpDSList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnUpDSListActionPerformed(e);
+			}
+		});
+		btnUpDSList.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		btnUpDSList.setBounds(10, 429, 75, 25);
+		dataSectionPanel.add(btnUpDSList);
+		
+		JButton btnDownDSList = new JButton("Down");
+		btnDownDSList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnDownDSListActionPerformed(e);
+			}
+		});
+		btnDownDSList.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		btnDownDSList.setBounds(100, 429, 75, 25);
+		dataSectionPanel.add(btnDownDSList);
 
 		layeredPane.add(docTypePanel, "name_3263440855000");
 		docTypePanel.setLayout(null);
@@ -493,74 +509,78 @@ public class FrmTaskCreator extends JDialog {
 		lblNewLabel_6.setBounds(11, 96, 90, 29);
 		lblNewLabel_6.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_5.add(lblNewLabel_6);
+		associationTypeCombo.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				associationTypeComboItemStateChanged(e);
+			}
+		});
+		associationTypeCombo.setEnabled(false);
 
 		associationTypeCombo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		associationTypeCombo.setBounds(117, 98, 272, 25);
-		associationTypeCombo.setModel(new DefaultComboBoxModel(new String[] { "Single Page", "Barcode", "Extract from other document" }));
+		associationTypeCombo.setModel(new DefaultComboBoxModel(new String[] {"Single Page", "Page Range", "Barcode or QR code", "Extract from other document"}));
 		panel_5.add(associationTypeCombo);
 
-		txtGetString.setBounds(117, 160, 272, 135);
-		txtGetString.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_5.add(txtGetString);
-		txtGetString.setLayout(null);
-
+		panelGetString.setBounds(117, 160, 272, 135);
+		panelGetString.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		panel_5.add(panelGetString);
+		panelGetString.setLayout(null);
+		
 		lblNewLabel_7.setBounds(66, 38, 12, 25);
 		lblNewLabel_7.setAlignmentX(Component.CENTER_ALIGNMENT);
 		lblNewLabel_7.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(lblNewLabel_7);
+		panelGetString.add(lblNewLabel_7);
 
 		lblNewLabel_8.setBounds(66, 67, 12, 25);
 		lblNewLabel_8.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(lblNewLabel_8);
+		panelGetString.add(lblNewLabel_8);
+		txtValueX1.setEnabled(false);
 
 		txtValueX1.setBounds(99, 38, 54, 25);
 		txtValueX1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(txtValueX1);
+		panelGetString.add(txtValueX1);
 		txtValueX1.setColumns(10);
+		txtValueY1.setEnabled(false);
 
 		txtValueY1.setBounds(99, 67, 54, 25);
 		txtValueY1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(txtValueY1);
+		panelGetString.add(txtValueY1);
 		txtValueY1.setColumns(10);
 
 		lblNewLabel_9.setBounds(189, 38, 12, 25);
 		lblNewLabel_9.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblNewLabel_9.setAlignmentX(Component.CENTER_ALIGNMENT);
-		txtGetString.add(lblNewLabel_9);
+		panelGetString.add(lblNewLabel_9);
 
 		lblNewLabel_10.setBounds(189, 67, 12, 25);
 		lblNewLabel_10.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(lblNewLabel_10);
+		panelGetString.add(lblNewLabel_10);
+		txtValueX2.setEnabled(false);
 
 		txtValueX2.setBounds(215, 38, 46, 25);
 		txtValueX2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(txtValueX2);
+		panelGetString.add(txtValueX2);
 		txtValueX2.setColumns(10);
+		txtValueY2.setEnabled(false);
 
 		txtValueY2.setBounds(215, 67, 46, 25);
 		txtValueY2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(txtValueY2);
+		panelGetString.add(txtValueY2);
 		txtValueY2.setColumns(10);
-
-		lblNewLabel_11.setBounds(9, 96, 53, 30);
-		lblNewLabel_11.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(lblNewLabel_11);
-
-		textField_5.setBounds(66, 96, 87, 30);
-		txtGetString.add(textField_5);
-		textField_5.setColumns(10);
 
 		btnSetZone.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnSetZone.setBounds(182, 99, 80, 25);
-		txtGetString.add(btnSetZone);
+		panelGetString.add(btnSetZone);
+		btnSetZone.setEnabled(false);
 
 		lblNewLabel_12.setBounds(7, 8, 55, 25);
 		lblNewLabel_12.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtGetString.add(lblNewLabel_12);
+		panelGetString.add(lblNewLabel_12);
+		comboFromDoc.setEnabled(false);
 
-		fromDocCombo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		fromDocCombo.setBounds(66, 9, 195, 25);
-		txtGetString.add(fromDocCombo);
+		comboFromDoc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		comboFromDoc.setBounds(66, 9, 195, 25);
+		panelGetString.add(comboFromDoc);
 
 		chkMandatoryOnDocumentTypePanel.setBounds(117, 129, 89, 25);
 		chkMandatoryOnDocumentTypePanel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -573,6 +593,11 @@ public class FrmTaskCreator extends JDialog {
 		btnClearDocument.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnClearDocument.setBounds(199, 373, 90, 25);
 		panel_5.add(btnClearDocument);
+		rdBtnManualAssociation.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				buttonGroupDoctypeSectionItemStateChanged(e);
+			}
+		});
 
 		rdBtnManualAssociation.setBounds(106, 67, 129, 25);
 		buttonGroupDoctypeSection.add(rdBtnManualAssociation);
@@ -586,23 +611,23 @@ public class FrmTaskCreator extends JDialog {
 		rdBtnAutoAssociation.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_5.add(rdBtnAutoAssociation);
 		
-		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, 
+		JPanel additionalPanelDocType = new JPanel();
+		additionalPanelDocType.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, 
 				new Color(255, 255, 255), new Color(160, 160, 160)), 
 				"Additional", TitledBorder.TRAILING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_6.setBounds(9, 305, 380, 55);
-		panel_5.add(panel_6);
-		panel_6.setLayout(null);
+		additionalPanelDocType.setBounds(152, 305, 237, 55);
+		panel_5.add(additionalPanelDocType);
+		additionalPanelDocType.setLayout(null);
 		
 		
 		chkFilterDocument.setBounds(10, 15, 111, 25);
-		panel_6.add(chkFilterDocument);
+		additionalPanelDocType.add(chkFilterDocument);
 		chkFilterDocument.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		
 		JButton mapDocumentFilter = new JButton("Map");
 		mapDocumentFilter.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		mapDocumentFilter.setBounds(127, 15, 100, 25);
-		panel_6.add(mapDocumentFilter);
+		additionalPanelDocType.add(mapDocumentFilter);
 
 		btnBackToDataSection.setPreferredSize(new Dimension(90, 25));
 		btnBackToDataSection.setMinimumSize(new Dimension(90, 25));
@@ -651,8 +676,7 @@ public class FrmTaskCreator extends JDialog {
 		lblNewLabel_14.setBounds(10, 45, 95, 25);
 		panel_7.add(lblNewLabel_14);
 
-		folderIdentifierCombo
-				.setModel(new DefaultComboBoxModel(new String[] { "Blank Page", "Barcode", "After Every" }));
+		folderIdentifierCombo.setModel(new DefaultComboBoxModel(new String[] { "Blank Page", "Barcode", "After Every" }));
 		folderIdentifierCombo.setBounds(113, 46, 444, 23);
 		panel_7.add(folderIdentifierCombo);
 
@@ -831,7 +855,6 @@ public class FrmTaskCreator extends JDialog {
 		panel.add(btnNewButton_7);
 	}
 	
-
 	/****************************************************************************************************************************/
 	
 	/*
@@ -862,6 +885,7 @@ public class FrmTaskCreator extends JDialog {
 					if(chkDefaultValue.isSelected()) {
 						strdefaultValue=txtDefaultValue.getText().trim();
 					}
+					String strJunkCharacter=txtJunkCharacter.getText().trim();
 					boolean mandatory=chkMandatory.isSelected();
 					boolean carryForward=chkCarryForward.isSelected();
 					boolean readonly=chkReadOnly.isSelected();
@@ -873,13 +897,14 @@ public class FrmTaskCreator extends JDialog {
 					}
 					boolean unique=chkUnique.isSelected();
 					boolean multiLine=chkMultiLine.isSelected();
-					Map<String, ArrayList<String>> filterFieldValues = new LinkedHashMap<String, ArrayList<String>>();
+					DefaultTableModel filterFieldValues = new DefaultTableModel();
 					if(chkFilterFields.isSelected()) {
-						
+						filterFieldValues = FrmMappingFilterFields.getTableModel();
 					}
 					dsDataSection.get(j).setCarryForward(carryForward);
 					dsDataSection.get(j).setDataType(strDatatype);
 					dsDataSection.get(j).setDefaultValue(strdefaultValue);
+					dsDataSection.get(j).setJunkCharacter(strJunkCharacter);
 					dsDataSection.get(j).setFilterFields(filterFieldValues);
 					dsDataSection.get(j).setMandatory(mandatory);
 					dsDataSection.get(j).setMultiLine(multiLine);
@@ -906,6 +931,7 @@ public class FrmTaskCreator extends JDialog {
 			if(chkDefaultValue.isSelected()) {
 				strdefaultValue=txtDefaultValue.getText().trim();
 			}
+			String strJunkCharacter = txtJunkCharacter.getText().trim();
 			boolean mandatory=chkMandatory.isSelected();
 			boolean carryForward=chkCarryForward.isSelected();
 			boolean readonly=chkReadOnly.isSelected();
@@ -917,12 +943,12 @@ public class FrmTaskCreator extends JDialog {
 			}
 			boolean unique=chkUnique.isSelected();
 			boolean multiLine=chkMultiLine.isSelected();
-			Map<String, ArrayList<String>> filterFieldValues = new LinkedHashMap<String, ArrayList<String>>();
+			DefaultTableModel filterFieldValues = new DefaultTableModel();
 			if(chkFilterFields.isSelected()) {
-				
+				filterFieldValues = FrmMappingFilterFields.getTableModel();
 			}
 			objDataSection=new DataSection();
-			objDataSection.associateValue(strDataFieldName, strDatatype, arrPickList, strdefaultValue,carryForward, mandatory, readonly, primary, unique, multiLine, filterFieldValues);
+			objDataSection.associateValue(strDataFieldName, strDatatype, arrPickList, strdefaultValue, strJunkCharacter, carryForward, mandatory, readonly, primary, unique, multiLine, filterFieldValues);
 			dsDataSection.add(objDataSection);
 			dataFieldListModel.addElement(strDataFieldName);
 		}	
@@ -974,10 +1000,8 @@ public class FrmTaskCreator extends JDialog {
 	
 	//Map filter Fields
 	public void btnMapFilterActionPerformed(java.awt.event.ActionEvent e) {
+		FrmMappingFilterFields frmMappingFilterFields = new FrmMappingFilterFields();
 		frmMappingFilterFields.setVisible(true);
-	}
-	public void btnAdvanceActionPerformed(java.awt.event.ActionEvent e) {
-		frmAdvanceDS.setVisible(true);
 	}
 	
 	public void txtDataFieldNameKeyTyped(PropertyChangeEvent evt) {
@@ -988,6 +1012,64 @@ public class FrmTaskCreator extends JDialog {
 		}
 			}
 	}
+	
+	//Need to change in arraylist as well so that order in maintained while saving in json
+	@SuppressWarnings(value = { "all" })
+	public void btnUpDSListActionPerformed(ActionEvent e) {
+		int index = dataFieldList.getSelectedIndex();
+		if(index!=0) {
+		String val=dataFieldListModel.getElementAt(index-1).toString();
+		dataFieldListModel.set(index-1, dataFieldList.getSelectedValue());
+		dataFieldListModel.set(index, val);
+		dataFieldList.setSelectedIndex(index-1);
+		DataSection temp=dsDataSection.get(index-1);
+		dsDataSection.add(index-1,dsDataSection.get(index));
+		dsDataSection.add(index,temp);
+		
+		}
+	}
+	
+	//Need to change in arraylist as well so that order in maintained while saving in json
+	@SuppressWarnings(value = { "all" })
+	public void btnDownDSListActionPerformed(ActionEvent e) {
+		int index = dataFieldList.getSelectedIndex();
+		if(index<dataFieldListModel.getSize()-1) {
+		String val=dataFieldListModel.getElementAt(index+1).toString();
+		dataFieldListModel.set(index+1, dataFieldList.getSelectedValue());
+		dataFieldListModel.set(index, val);
+		dataFieldList.setSelectedIndex(index+1);
+		}	
+	}
+	
+	protected void associationTypeComboItemStateChanged(ItemEvent e) {
+		if(associationTypeCombo.getSelectedItem().equals("Extract from other document") || associationTypeCombo.getSelectedItem().equals("Barcode or QR code")) {
+			comboFromDoc.setEnabled(true);
+			txtValueX1.setEnabled(true);
+			txtValueX2.setEnabled(true);
+			txtValueY1.setEnabled(true);
+			txtValueY2.setEnabled(true);
+			
+			btnSetZone.setEnabled(true);
+		}
+		else {
+			comboFromDoc.setEnabled(false);
+			txtValueX1.setEnabled(false);
+			txtValueX2.setEnabled(false);
+			txtValueY1.setEnabled(false);
+			txtValueY2.setEnabled(false);
+			
+			btnSetZone.setEnabled(false);
+		}
+	}
+
+	public void buttonGroupDoctypeSectionItemStateChanged(ItemEvent e) {
+		if(rdBtnManualAssociation.isSelected()) {
+			associationTypeCombo.setEnabled(false);
+		}
+		else {
+			associationTypeCombo.setEnabled(true);
+		}
+	}
 	/****************************************************************************************************************************/
 	/*
 	 * Other function
@@ -996,6 +1078,7 @@ public class FrmTaskCreator extends JDialog {
 		txtDataFieldName.setText("");
 		dataTypeCombo.setSelectedIndex(0);
 		txtDefaultValue.setText("");
+		txtJunkCharacter.setText("");
 		chkPickList.setSelected(false);
 		chkMandatory.setSelected(false);
 		chkCarryForward.setSelected(false);
@@ -1005,6 +1088,8 @@ public class FrmTaskCreator extends JDialog {
 		dataSectionPickList.removeAllElements();
 		pickListCombo.removeAllItems();
 		chkDefaultValue.setSelected(false);
+		txtDefaultValue.setText("");
+		txtDefaultValue.setEnabled(false);
 		chkMultiLine.setSelected(false);
 		dataSectionPickList.removeAllElements();
 	}
@@ -1022,6 +1107,7 @@ public class FrmTaskCreator extends JDialog {
 	
 	//load data back to the fields
 	public void loadData() {
+		clearDataSectionFields();
 		String dataFieldName = dataFieldList.getSelectedValue();
 		//System.out.println(dataFieldName);
 		for(int i=0;i<dsDataSection.size();i++) {
@@ -1034,6 +1120,7 @@ public class FrmTaskCreator extends JDialog {
 				txtDefaultValue.setText(dsDataSection.get(i).getDefaultValue());
 				chkDefaultValue.setSelected(true);
 				}
+				txtJunkCharacter.setText(dsDataSection.get(i).getJunkCharacter());
 				if(!dsDataSection.get(i).getPickListValue().isEmpty()) {
 					chkPickList.setSelected(true);
 					for(int j=0;j<dsDataSection.get(i).getPickListValue().size();j++) {

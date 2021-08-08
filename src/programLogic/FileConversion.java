@@ -1,26 +1,31 @@
 package programLogic;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
+import javax.swing.JOptionPane;
 
-import org.apache.pdfbox.contentstream.PDContentStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 
 /*author
  * Saurabh Kumar Maurya 
@@ -214,9 +219,50 @@ public class FileConversion {
 		
 		return null;
 	}
+/*
+ * This function convert PDF to Tiff, the size of the tiff file might increase that of the original PDF Document
+ * depending on compression, ImageType and DPI used.
+ * 
+ */
+	public void convertPDFToTiff(PDDocument document,String outputFolder,int DPI, ImageType imageType, String compressionType) {
+		try {
+			// save page caputres to file.
+			ImageOutputStream ios = ImageIO.createImageOutputStream(new File(outputFolder));
+			ImageWriter writer = ImageIO.getImageWritersByFormatName("tiff").next();
+			writer.setOutput(ios);
+			PDFRenderer pdfRenderer = new PDFRenderer(document);
+			int pageCount = document.getNumberOfPages();
 
+			BufferedImage[] images = new BufferedImage[pageCount];
+			writer.setOutput(ios);
+			ImageWriteParam params = writer.getDefaultWriteParam();
+			params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+
+			// Compression: None, PackBits, ZLib, Deflate, LZW, JPEG and CCITT
+			// variants allowed
+			params.setCompressionType(compressionType);
+
+			writer.prepareWriteSequence(null);
+
+			for (int page = 0; page < document.getNumberOfPages(); page++) {
+				BufferedImage image = pdfRenderer.renderImageWithDPI(page,DPI, imageType);
+				images[page] = image;
+				IIOMetadata metadata = writer.getDefaultImageMetadata(new ImageTypeSpecifier(image), params);
+				writer.writeToSequence(new IIOImage(image, null, metadata), params);
+
+			}
+			// clean up resources
+			ios.flush();
+			ios.close();
+			writer.dispose();
+			document.close();
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, ex.getMessage()+"\n"+ ex.getCause());
+		}
+	}
+	
 	public static void main(String args[]) throws IOException {
-		File file = new File("D:\\Personal\\me.jpg");
+		File file = new File("D:\\pdfbox\\imageCapture.tif");
 		FileConversion fc = new FileConversion();
 		PDDocument document = new PDDocument();
 		document = fc.convertToPDF(file);
